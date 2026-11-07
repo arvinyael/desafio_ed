@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador EDO: Fondo de Ahorro Comunitario</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        },
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                        borderbg: '#334155'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for tables */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-borderbg bg-cardbg/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2.5 bg-brand-500/10 text-brand-500 rounded-xl border border-brand-500/20">
+                    <i data-lucide="piggy-bank" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Simulador EDO: Fondo de Ahorro Comunitario</h1>
+                    <p class="text-xs text-slate-400">Métodos Numéricos: Solución Analítica vs. Heun vs. RK4</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-slate-800 border border-slate-700 text-slate-300 text-xs rounded-full font-medium">
+                    Desafío EDO 2026
+                </span>
+                <a href="#problema" class="px-3 py-1 text-xs text-brand-500 hover:text-brand-400 transition font-medium">
+                    Ver Contexto
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        
+        <!-- Context & Problem Description Card -->
+        <section id="problema" class="bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-4 mb-4">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="book-open" class="text-brand-500 w-5 h-5"></i>
+                    <h2 class="text-lg font-semibold text-white">1. Contexto y Modelo Matemático</h2>
+                </div>
+                <span class="text-xs text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md border border-slate-700">EDO de 1.er Orden con Valor Inicial</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-300">
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-white flex items-center gap-1.5">
+                        <i data-lucide="users" class="w-4 h-4 text-brand-500"></i> Problema Social
+                    </h3>
+                    <p class="leading-relaxed text-xs text-slate-300">
+                        Una asociación comunitaria crea un fondo rotatorio de capital de trabajo para otorgar microcréditos a pequeños emprendedores locales. El fondo ingresa cuotas de ahorro constantes y desembolsa microcréditos proporcionales al capital acumulado.
+                    </p>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-white flex items-center gap-1.5">
+                        <i data-lucide="calculator" class="w-4 h-4 text-brand-500"></i> Modelo Matemático (EDO)
+                    </h3>
+                    <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800 font-mono text-center text-emerald-400 text-sm">
+                        dC/dt = A - k · C
+                    </div>
+                    <p class="text-xs text-slate-400">
+                        Donde <strong>C(t)</strong> = Capital acumulado (Bs), <strong>A</strong> = Aportes mensuales (Bs/mes), <strong>k</strong> = Tasa de desembolso (1/mes), <strong>C(0) = C₀</strong> (Capital inicial).
+                    </p>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-white flex items-center gap-1.5">
+                        <i data-lucide="file-check" class="w-4 h-4 text-brand-500"></i> Solución Exacta (Analítica)
+                    </h3>
+                    <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800 font-mono text-center text-blue-400 text-xs sm:text-sm">
+                        C(t) = (A / k) + (C₀ - A / k) · e<sup>-k · t</sup>
+                    </div>
+                    <p class="text-xs text-slate-400">
+                        Resuelta por separación de variables / factor integrante para verificar la precisión de los métodos de Heun (RK2) y RK4.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Control Panel & Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Parameters Sidebar (4 cols) -->
+            <div class="lg:col-span-4 bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl space-y-6 h-fit">
+                <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i> Parámetros de Entrada
+                    </h2>
+                    <button id="btnReset" class="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Restablecer
+                    </button>
+                </div>
+
+                <form id="simForm" class="space-y-4 text-xs">
+                    <!-- Capital Inicial C0 -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label for="c0" class="font-medium text-slate-200">Capital Inicial (C₀):</label>
+                            <span id="c0Val" class="font-mono text-emerald-400 font-bold">5,000 Bs</span>
+                        </div>
+                        <input type="number" id="c0" value="5000" min="0" step="500" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+
+                    <!-- Aportes Mensuales A -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label for="aporteA" class="font-medium text-slate-200">Aportes Mensuales (A):</label>
+                            <span id="aVal" class="font-mono text-emerald-400 font-bold">1,200 Bs/mes</span>
+                        </div>
+                        <input type="number" id="aporteA" value="1200" min="100" step="100" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+
+                    <!-- Tasa de Desembolso k -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label for="tasaK" class="font-medium text-slate-200">Tasa de Desembolso (k):</label>
+                            <span id="kVal" class="font-mono text-emerald-400 font-bold">0.15 /mes</span>
+                        </div>
+                        <input type="number" id="tasaK" value="0.15" min="0.01" max="1" step="0.01" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+
+                    <!-- Tiempo de Simulación T -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label for="tiempoT" class="font-medium text-slate-200">Tiempo Total (T):</label>
+                            <span id="tVal" class="font-mono text-emerald-400 font-bold">12 meses</span>
+                        </div>
+                        <input type="number" id="tiempoT" value="12" min="1" max="60" step="1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none">
+                    </div>
+
+                    <div class="border-t border-slate-700/60 pt-4 space-y-4">
+                        <span class="font-semibold text-slate-300 block text-xs">Comparativa de Tamaños de Paso:</span>
+                        
+                        <!-- Tamaño de Paso Principal h -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label for="stepH" class="font-medium text-slate-200">Paso Principal (h):</label>
+                                <span id="hVal" class="font-mono text-indigo-400 font-bold">1.0 mes</span>
+                            </div>
+                            <input type="number" id="stepH" value="1.0" min="0.05" max="2" step="0.05" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none">
+                        </div>
+
+                        <!-- Tamaño de Paso Secundario h2 -->
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <label for="stepH2" class="font-medium text-slate-200">Paso Fino/Comparativo (h₂):</label>
+                                <span id="h2Val" class="font-mono text-amber-400 font-bold">0.5 mes</span>
+                            </div>
+                            <input type="number" id="stepH2" value="0.5" min="0.01" max="1" step="0.05" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Calculated Steady State Indicator -->
+                    <div class="bg-slate-900/70 p-3 rounded-lg border border-slate-800 text-xs">
+                        <div class="text-slate-400">Capital de Equilibrio Teórico (A/k):</div>
+                        <div id="steadyStateVal" class="text-base font-bold text-emerald-400 font-mono mt-0.5">8,000.00 Bs</div>
+                    </div>
+
+                    <button type="button" id="btnSimulate" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+                        <i data-lucide="play" class="w-4 h-4"></i> Ejecutar Simulación
+                    </button>
+                </form>
+            </div>
+
+            <!-- Visualization & Results Area (8 cols) -->
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- Main Solution Graph -->
+                <div class="bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-700/60 pb-3">
+                        <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="line-chart" class="w-4 h-4 text-brand-500"></i> Evolución Temporal del Capital
+                        </h2>
+                        <div class="flex items-center gap-4 text-xs">
+                            <span class="flex items-center gap-1 text-slate-300">
+                                <span class="w-3 h-0.5 bg-blue-500 inline-block"></span> Analítica
+                            </span>
+                            <span class="flex items-center gap-1 text-slate-300">
+                                <span class="w-3 h-0.5 bg-indigo-400 inline-block"></span> Heun (h)
+                            </span>
+                            <span class="flex items-center gap-1 text-slate-300">
+                                <span class="w-3 h-0.5 bg-emerald-400 inline-block"></span> RK4 (h)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="relative w-full h-[320px]">
+                        <canvas id="solutionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Error Analysis Graph -->
+                <div class="bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-700/60 pb-3">
+                        <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400"></i> Análisis de Error Absoluto |C<sub>exacto</sub> - C<sub>aprox</sub>|
+                        </h2>
+                        <span class="text-xs text-slate-400">Comparación entre Heun y RK4</span>
+                    </div>
+                    <div class="relative w-full h-[240px]">
+                        <canvas id="errorChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Comparative Summary Cards across Steps h vs h2 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-cardbg rounded-2xl border border-borderbg p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> Evaluación Paso Principal (h = <span class="lblH font-mono">1.0</span>)
+                        </h3>
+                        <span class="text-xs font-mono text-slate-400">Error en t = <span class="lblTMax font-mono">12</span></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 my-2">
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-indigo-400 font-semibold block mb-1">Método de Heun</span>
+                            <div class="text-xs text-slate-300">Err. Abs: <span id="heunErrAbsH" class="font-mono font-bold text-white">0.00</span></div>
+                            <div class="text-xs text-slate-300">Err. Rel: <span id="heunErrRelH" class="font-mono font-bold text-amber-400">0.00%</span></div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-emerald-400 font-semibold block mb-1">Método RK4</span>
+                            <div class="text-xs text-slate-300">Err. Abs: <span id="rk4ErrAbsH" class="font-mono font-bold text-white">0.00</span></div>
+                            <div class="text-xs text-slate-300">Err. Rel: <span id="rk4ErrRelH" class="font-mono font-bold text-emerald-400">0.00%</span></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 italic mt-2">
+                    * Muestra los errores al final del periodo proyectado usando el paso de discretización inicial.
+                </p>
+            </div>
+
+            <div class="bg-cardbg rounded-2xl border border-borderbg p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Evaluación Paso Fino (h₂ = <span class="lblH2 font-mono">0.5</span>)
+                        </h3>
+                        <span class="text-xs font-mono text-slate-400">Error en t = <span class="lblTMax font-mono">12</span></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 my-2">
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-indigo-400 font-semibold block mb-1">Método de Heun</span>
+                            <div class="text-xs text-slate-300">Err. Abs: <span id="heunErrAbsH2" class="font-mono font-bold text-white">0.00</span></div>
+                            <div class="text-xs text-slate-300">Err. Rel: <span id="heunErrRelH2" class="font-mono font-bold text-amber-400">0.00%</span></div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span class="text-xs text-emerald-400 font-semibold block mb-1">Método RK4</span>
+                            <div class="text-xs text-slate-300">Err. Abs: <span id="rk4ErrAbsH2" class="font-mono font-bold text-white">0.00</span></div>
+                            <div class="text-xs text-slate-300">Err. Rel: <span id="rk4ErrRelH2" class="font-mono font-bold text-emerald-400">0.00%</span></div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 italic mt-2">
+                    * Reducir el paso $h$ disminuye proporcionalmente el error truncation de los métodos numéricos.
+                </p>
+            </div>
+        </section>
+
+        <!-- Detailed Iteration Table Section -->
+        <section class="bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-700/60 pb-3">
+                <div>
+                    <h2 class="text-base font-semibold text-white flex items-center gap-2">
+                        <i data-lucide="table" class="w-4 h-4 text-brand-500"></i> Tabla Interactiva Paso a Paso (h = <span class="lblH font-mono">1.0</span>)
+                    </h2>
+                    <p class="text-xs text-slate-400">Valores iterativos de la simulación y porcentaje de error de cada método.</p>
+                </div>
+                <button id="btnExportCSV" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 border border-slate-700 rounded-lg flex items-center gap-1.5 transition">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar CSV
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono border-collapse">
+                    <thead>
+                        <tr class="bg-slate-900/90 text-slate-300 border-b border-slate-800">
+                            <th class="p-3">Paso (i)</th>
+                            <th class="p-3">t<sub>i</sub> (meses)</th>
+                            <th class="p-3 text-blue-400">C<sub>Analítica</sub> (Bs)</th>
+                            <th class="p-3 text-indigo-400">C<sub>Heun</sub> (Bs)</th>
+                            <th class="p-3 text-slate-400">Err. Rel Heun (%)</th>
+                            <th class="p-3 text-emerald-400">C<sub>RK4</sub> (Bs)</th>
+                            <th class="p-3 text-slate-400">Err. Rel RK4 (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-800/60 text-slate-300">
+                        <!-- Dynamic rows inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Community Interpretation & Conclusion Section -->
+        <section class="bg-cardbg rounded-2xl border border-borderbg p-6 shadow-xl space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-700/60 pb-3">
+                <i data-lucide="message-square-quote" class="text-brand-500 w-5 h-5"></i>
+                <h2 class="text-base font-semibold text-white">4. Interpretación Comunitaria y Conclusiones del Modelo</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-300">
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="font-semibold text-emerald-400 flex items-center gap-1.5 text-sm">
+                        <i data-lucide="heart-handshake" class="w-4 h-4"></i> Impacto en la Comunidad
+                    </h3>
+                    <p id="communityInsight" class="leading-relaxed">
+                        Cargando análisis...
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="font-semibold text-blue-400 flex items-center gap-1.5 text-sm">
+                        <i data-lucide="cpu" class="w-4 h-4"></i> Justificación de Métodos Numéricos
+                    </h3>
+                    <p id="numericalInsight" class="leading-relaxed">
+                        Cargando evaluación numérica...
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-borderbg bg-cardbg py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400 space-y-1">
+            <p>Desafío Individual: Ecuaciones Diferenciales Ordinarias (EDO) con Condición Inicial</p>
+            <p class="text-slate-500">Desarrollado para evaluación académica de métodos numéricos (Heun vs RK4) | Entrega 2026</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // DOM Elements
+        const simForm = document.getElementById('simForm');
+        const c0Input = document.getElementById('c0');
+        const aporteAInput = document.getElementById('aporteA');
+        const tasaKInput = document.getElementById('tasaK');
+        const tiempoTInput = document.getElementById('tiempoT');
+        const stepHInput = document.getElementById('stepH');
+        const stepH2Input = document.getElementById('stepH2');
+
+        const c0Val = document.getElementById('c0Val');
+        const aVal = document.getElementById('aVal');
+        const kVal = document.getElementById('kVal');
+        const tVal = document.getElementById('tVal');
+        const hVal = document.getElementById('hVal');
+        const h2Val = document.getElementById('h2Val');
+        const steadyStateVal = document.getElementById('steadyStateVal');
+
+        const lblHList = document.querySelectorAll('.lblH');
+        const lblH2List = document.querySelectorAll('.lblH2');
+        const lblTMaxList = document.querySelectorAll('.lblTMax');
+
+        const tableBody = document.getElementById('tableBody');
+        const communityInsight = document.getElementById('communityInsight');
+        const numericalInsight = document.getElementById('numericalInsight');
+
+        // Global Chart Instances
+        let solutionChartInstance = null;
+        let errorChartInstance = null;
+
+        // EDO Function: dC/dt = f(t, C) = A - k * C
+        function f(t, C, A, k) {
+            return A - k * C;
+        }
+
+        // Exact Analytical Solution: C(t) = (A/k) + (C0 - A/k) * exp(-k * t)
+        function analyticalSolution(t, C0, A, k) {
+            return (A / k) + (C0 - (A / k)) * Math.exp(-k * t);
+        }
+
+        // Numerical Solver Function
+        function solveEDO(C0, A, k, T, h) {
+            const steps = Math.ceil(T / h);
+            const data = [];
+            
+            let t = 0;
+            let C_heun = C0;
+            let C_rk4 = C0;
+
+            for (let i = 0; i <= steps; i++) {
+                t = i * h;
+                if (t > T) t = T; // Clamp to T
+
+                const C_exact = analyticalSolution(t, C0, A, k);
+                
+                // Absolute and Relative errors
+                const errAbsHeun = Math.abs(C_exact - C_heun);
+                const errRelHeun = C_exact !== 0 ? (errAbsHeun / Math.abs(C_exact)) * 100 : 0;
+
+                const errAbsRK4 = Math.abs(C_exact - C_rk4);
+                const errRelRK4 = C_exact !== 0 ? (errAbsRK4 / Math.abs(C_exact)) * 100 : 0;
+
+                data.push({
+                    step: i,
+                    t: t,
+                    exact: C_exact,
+                    heun: C_heun,
+                    errAbsHeun: errAbsHeun,
+                    errRelHeun: errRelHeun,
+                    rk4: C_rk4,
+                    errAbsRK4: errAbsRK4,
+                    errRelRK4: errRelRK4
+                });
+
+                // Next Step Calculations for Heun & RK4
+                if (i < steps) {
+                    const currentH = Math.min(h, T - t); // handle last step remainder
+
+                    // --- Heun Method (RK2) ---
+                    const k1_h = f(t, C_heun, A, k);
+                    const C_predictor = C_heun + currentH * k1_h;
+                    const k2_h = f(t + currentH, C_predictor, A, k);
+                    C_heun = C_heun + (currentH / 2) * (k1_h + k2_h);
+
+                    // --- Runge-Kutta 4th Order (RK4) ---
+                    const k1 = f(t, C_rk4, A, k);
+                    const k2 = f(t + currentH / 2, C_rk4 + (currentH / 2) * k1, A, k);
+                    const k3 = f(t + currentH / 2, C_rk4 + (currentH / 2) * k2, A, k);
+                    const k4 = f(t + currentH, C_rk4 + currentH * k3, A, k);
+                    C_rk4 = C_rk4 + (currentH / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
+                }
+            }
+
+            return data;
+        }
+
+        // Format Currency Helper
+        function formatBs(val) {
+            return new Intl.NumberFormat('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val) + ' Bs';
+        }
+
+        // Update Dashboard
+        function runSimulation() {
+            // Read inputs
+            const C0 = parseFloat(c0Input.value) || 0;
+            const A = parseFloat(aporteAInput.value) || 0;
+            const k = parseFloat(tasaKInput.value) || 0.01;
+            const T = parseFloat(tiempoTInput.value) || 1;
+            const h = parseFloat(stepHInput.value) || 0.1;
+            const h2 = parseFloat(stepH2Input.value) || 0.05;
+
+            // Update Labels UI
+            c0Val.textContent = formatBs(C0);
+            aVal.textContent = `${A.toLocaleString()} Bs/mes`;
+            kVal.textContent = `${k} /mes`;
+            tVal.textContent = `${T} meses`;
+            hVal.textContent = `${h} mes`;
+            h2Val.textContent = `${h2} mes`;
+
+            lblHList.forEach(el => el.textContent = h);
+            lblH2List.forEach(el => el.textContent = h2);
+            lblTMaxList.forEach(el => el.textContent = T);
+
+            const steadyState = A / k;
+            steadyStateVal.textContent = formatBs(steadyState);
+
+            // Execute simulations
+            const resultsH = solveEDO(C0, A, k, T, h);
+            const resultsH2 = solveEDO(C0, A, k, T, h2);
+
+            // Update Final Errors Cards
+            const lastH = resultsH[resultsH.length - 1];
+            const lastH2 = resultsH2[resultsH2.length - 1];
+
+            document.getElementById('heunErrAbsH').textContent = lastH.errAbsHeun.toFixed(4) + ' Bs';
+            document.getElementById('heunErrRelH').textContent = lastH.errRelHeun.toFixed(4) + '%';
+            document.getElementById('rk4ErrAbsH').textContent = lastH.errAbsRK4.toFixed(6) + ' Bs';
+            document.getElementById('rk4ErrRelH').textContent = lastH.errRelRK4.toFixed(6) + '%';
+
+            document.getElementById('heunErrAbsH2').textContent = lastH2.errAbsHeun.toFixed(4) + ' Bs';
+            document.getElementById('heunErrRelH2').textContent = lastH2.errRelHeun.toFixed(4) + '%';
+            document.getElementById('rk4ErrAbsH2').textContent = lastH2.errAbsRK4.toFixed(6) + ' Bs';
+            document.getElementById('rk4ErrRelH2').textContent = lastH2.errRelRK4.toFixed(6) + '%';
+
+            // Populate Iteration Table for Paso Principal (h)
+            tableBody.innerHTML = '';
+            resultsH.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40 transition';
+                tr.innerHTML = `
+                    <td class="p-3 border-b border-slate-800/60">${row.step}</td>
+                    <td class="p-3 border-b border-slate-800/60 font-semibold">${row.t.toFixed(2)}</td>
+                    <td class="p-3 border-b border-slate-800/60 text-blue-400 font-bold">${row.exact.toFixed(2)}</td>
+                    <td class="p-3 border-b border-slate-800/60 text-indigo-400">${row.heun.toFixed(2)}</td>
+                    <td class="p-3 border-b border-slate-800/60 text-slate-400">${row.errRelHeun.toFixed(4)}%</td>
+                    <td class="p-3 border-b border-slate-800/60 text-emerald-400 font-bold">${row.rk4.toFixed(2)}</td>
+                    <td class="p-3 border-b border-slate-800/60 text-slate-400">${row.errRelRK4.toFixed(6)}%</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            // Update Graphs
+            updateCharts(resultsH);
+
+            // Update Text Interpretations
+            updateInterpretations(C0, A, k, T, steadyState, lastH);
+        }
+
+        // Render Charts using Chart.js
+        function updateCharts(results) {
+            const labels = results.map(r => `t=${r.t.toFixed(1)}`);
+            const dataExact = results.map(r => r.exact);
+            const dataHeun = results.map(r => r.heun);
+            const dataRK4 = results.map(r => r.rk4);
+
+            const errHeun = results.map(r => r.errAbsHeun);
+            const errRK4 = results.map(r => r.errAbsRK4);
+
+            // 1. Solution Chart
+            const ctxSol = document.getElementById('solutionChart').getContext('2d');
+            if (solutionChartInstance) solutionChartInstance.destroy();
+
+            solutionChartInstance = new Chart(ctxSol, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Solución Analítica (Exacta)',
+                            data: dataExact,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                            borderWidth: 2.5,
+                            pointRadius: 3,
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Método de Heun (RK2)',
+                            data: dataHeun,
+                            borderColor: '#818cf8',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 4,
+                            pointStyle: 'rectRot',
+                            fill: false
+                        },
+                        {
+                            label: 'Runge-Kutta 4° Ord (RK4)',
+                            data: dataRK4,
+                            borderColor: '#34d399',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)} Bs`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        y: {
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8', callback: val => val.toLocaleString() + ' Bs' }
+                        }
+                    }
+                }
+            });
+
+            // 2. Error Chart
+            const ctxErr = document.getElementById('errorChart').getContext('2d');
+            if (errorChartInstance) errorChartInstance.destroy();
+
+            errorChartInstance = new Chart(ctxErr, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Error Absoluto Heun',
+                            data: errHeun,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Error Absoluto RK4',
+                            data: errRK4,
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1', boxWidth: 12 } },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(6)} Bs`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        // Textual Interpretations
+        function updateInterpretations(C0, A, k, T, steadyState, lastStep) {
+            const finalCapital = lastStep.exact;
+            const diffEquilibrium = steadyState - finalCapital;
+            
+            let communityText = '';
+            if (C0 < steadyState) {
+                communityText = `El fondo comunitario inicia con un capital de <strong>${formatBs(C0)}</strong>. Debido a que la tasa de aportes semanales/mensuales (<strong>${A} Bs/mes</strong>) supera los desembolsos iniciales, el capital crece progresivamente hacia un estado de equilibrio máximo de <strong>${formatBs(steadyState)}</strong>. Al cabo de <strong>${T} meses</strong>, la comunidad habrá acumulado <strong>${formatBs(finalCapital)}</strong>, garantizando mayor solvencia para otorgar microcréditos locales.`;
+            } else if (C0 > steadyState) {
+                communityText = `El capital inicial de <strong>${formatBs(C0)}</strong> es superior al flujo constante de sostenimiento. La alta tasa de colocación de préstamos (k = ${k}) reduce gradualmente el capital hasta estabilizarse en el valor límite de <strong>${formatBs(steadyState)}</strong> en el largo plazo. En t = ${T} meses, el fondo cuenta con <strong>${formatBs(finalCapital)}</strong>.`;
+            } else {
+                communityText = `El fondo se encuentra en perfecto equilibrio financiero desde el inicio. El capital acumulado se mantendrá constante en <strong>${formatBs(steadyState)}</strong> durante todo el horizonte de tiempo.`;
+            }
+
+            const bestMethod = lastStep.errAbsRK4 < lastStep.errAbsHeun ? 'Runge-Kutta de 4.º orden (RK4)' : 'Método de Heun';
+            const numericalText = `En esta simulación, el método <strong>${bestMethod}</strong> ofreció la mayor precisión con un error relativo de apenas <strong>${lastStep.errRelRK4.toFixed(6)}%</strong> frente a la solución analítica exacta. El método de Heun (RK2) registró un error relativo de <strong>${lastStep.errRelHeun.toFixed(4)}%</strong>. Esto confirma que RK4 es ideal para proyecciones financieras comunitarias de alta exactitud.`;
+
+            communityInsight.innerHTML = communityText;
+            numericalInsight.innerHTML = numericalText;
+        }
+
+        // Export to CSV Function
+        function exportCSV() {
+            const C0 = parseFloat(c0Input.value) || 0;
+            const A = parseFloat(aporteAInput.value) || 0;
+            const k = parseFloat(tasaKInput.value) || 0.01;
+            const T = parseFloat(tiempoTInput.value) || 1;
+            const h = parseFloat(stepHInput.value) || 0.1;
+
+            const results = solveEDO(C0, A, k, T, h);
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Paso,Tiempo_meses,Solucion_Analitica,Metodo_Heun,Error_Rel_Heun_Pct,Metodo_RK4,Error_Rel_RK4_Pct\n";
+
+            results.forEach(r => {
+                csvContent += `${r.step},${r.t.toFixed(4)},${r.exact.toFixed(4)},${r.heun.toFixed(4)},${r.errRelHeun.toFixed(6)},${r.rk4.toFixed(4)},${r.errRelRK4.toFixed(6)}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Simulacion_Fondo_Ahorro_h${h}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Event Listeners
+        document.getElementById('btnSimulate').addEventListener('click', runSimulation);
+        document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+        document.getElementById('btnReset').addEventListener('click', () => {
+            c0Input.value = 5000;
+            aporteAInput.value = 1200;
+            tasaKInput.value = 0.15;
+            tiempoTInput.value = 12;
+            stepHInput.value = 1.0;
+            stepH2Input.value = 0.5;
+            runSimulation();
+        });
+
+        // Instant update on input change
+        [c0Input, aporteAInput, tasaKInput, tiempoTInput, stepHInput, stepH2Input].forEach(input => {
+            input.addEventListener('input', runSimulation);
+        });
+
+        // Initialize on Page Load
+        window.onload = function() {
+            lucide.createIcons();
+            runSimulation();
+        };
+    </script>
+</body>
+</html>

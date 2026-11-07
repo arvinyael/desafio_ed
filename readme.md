@@ -1,4 +1,4 @@
-# Simulador de EDO: Fondo de Ahorro Comunitario 📈💰
+# Simulador de EDO: Fondo de Ahorro Comunitario
 **Desafío Individual: Modelar un problema real con Ecuaciones Diferenciales Ordinarias**  
 **Materia:** Ecuaciones Diferenciales / Métodos Numéricos  
 **Estudiante:** Arvin Yael Vargas Condori  
@@ -6,7 +6,7 @@
 
 ---
 
-## 📌 1. Propósito y Contexto del Proyecto
+## 1. Propósito y Contexto del Proyecto
 
 El objetivo de este proyecto es modelar la evolución temporal del capital acumulado en un **Fondo de Ahorro Comunitario y Capital de Trabajo** orientado a otorgar microcréditos a emprendedores de una junta vecinal.
 
@@ -14,7 +14,7 @@ Mediante una Ecuación Diferencial Ordinaria (EDO) de primer orden con condició
 
 ---
 
-## 🧮 2. Modelo Matemático
+## 2. Modelo Matemático
 
 ### Ecuación Diferencial Ordinaria (EDO)
 $$\frac{dC}{dt} = A - k \cdot C, \quad C(0) = C_0$$
@@ -36,7 +36,7 @@ $$\lim_{t \to \infty} C(t) = \frac{A}{k}$$
 
 ---
 
-## 💻 3. Métodos Numéricos Implementados
+## 3. Métodos Numéricos Implementados
 
 1. **Método de Heun (Runge-Kutta de Orden 2):**
    * Predictor (Euler): $C_{i+1}^* = C_i + h \cdot f(t_i, C_i)$
@@ -51,7 +51,7 @@ $$\lim_{t \to \infty} C(t) = \frac{A}{k}$$
 
 ---
 
-## 📊 4. Análisis Comparativo de Errores
+## 4. Análisis Comparativo de Errores
 
 El modelo evalúa automáticamente los siguientes indicadores de precisión para cada paso iterativo frente a la solución analítica:
 
@@ -62,12 +62,12 @@ Se incluye la comparación con al menos dos tamaños de paso ($h$ principal e $h
 
 ---
 
-## 🌐 5. Aplicación Web Interactiva
+## 5. Aplicación Web Interactiva
 
 La simulación web se encuentra desplegada y no requiere instalación previa:
 
-* 🚀 **Enlace a la Simulación Web:** `[INSERTA_TU_URL_AQUÍ]` *(ej. GitHub Pages / Vercel)*
-* 📹 **Video Explicativo (1 minuto):** `[INSERTA_TU_ENLACE_DE_YOUTUBE_O_VIMEO_AQUÍ]`
+* **Enlace a la Simulación Web:** `[INSERTA_TU_URL_AQUÍ]` *(ej. GitHub Pages / Vercel)*
+* **Video Explicativo (1 minuto):** `[INSERTA_TU_ENLACE_DE_YOUTUBE_O_VIMEO_AQUÍ]`
 
 ### Características de la Aplicación:
 * **Entradas interactivas:** Ajuste de $C_0$, $A$, $k$, $T$ (tiempo), $h$ y $h_2$.
@@ -77,7 +77,7 @@ La simulación web se encuentra desplegada y no requiere instalación previa:
 
 ---
 
-## 📁 6. Estructura del Repositorio
+## 6. Estructura del Repositorio
 
 ```text
 .
@@ -89,7 +89,7 @@ La simulación web se encuentra desplegada y no requiere instalación previa:
 
 ---
 
-## 🚀 7. Instrucciones de Ejecución Local
+## 7. Instrucciones de Ejecución Local
 
 1. **Clonar el repositorio:**
    ```bash
